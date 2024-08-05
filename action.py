@@ -28,5 +28,5 @@ class Action:
     def transactionCommit(self, driver: webdriver):
         #取引パスワード入力
         tra_passwd = driver.find_element(by=By.ID, value="toriPwd")
-        tra_passwd.send_keys(self.TRANSACTION_PASSWORD)
+        tra_passwd.send_keys(self.NEOBANK_TRANSACTION_PASSWORD)
         driver.find_element(by=By.XPATH, value="//nb-button[contains(@nblabel,'確定する')]").click()
