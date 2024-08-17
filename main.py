@@ -16,16 +16,17 @@ class Main:
     service = Service(executable_path="/usr/local/bin/chromedriver")
     driver = webdriver.Chrome(service=service, options=options)
 
-    driver.get("https://site3.sbisec.co.jp/ETGate/?OutSide=on&_ControlID=WPLETsmR001Control&_DataStoreID=DSWPLETsmR001Control&sw_page=Banking&cat1=home&cat2=none&getFlg=on&int_pr1=150313_cmn_gnavi:3_dmenu_01")
-    time.sleep(3)
+    # SBI証券のトップページを開く
+    driver.get("https://site3.sbisec.co.jp/ETGate/")
+    time.sleep(2)
     login.sbiSecLoginFlow(driver)
-    time.sleep(3)
+    time.sleep(2)
     action.inputMoney(driver)
-    time.sleep(3)
+    time.sleep(2)
     login.neoBankLoginFlow(driver)
-    time.sleep(3)
+    time.sleep(2)
     action.transactionCommit(driver)
-    time.sleep(3)  
+    time.sleep(2)  
 
     driver.quit()
 
