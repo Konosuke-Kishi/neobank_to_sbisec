@@ -1,13 +1,15 @@
 # ======================================================
 # ライブラリ
 # ======================================================
-from main import auto_payment
+from main import delete_auto_payment_log, auto_payment
 from notify import line_notify
 from selenium.common.exceptions import WebDriverException, NoSuchElementException, TimeoutException
 # ======================================================
 # 定期実行用スクリプト
 # ======================================================
 if __name__ == '__main__':
+    # 月初ならログ削除
+    delete_auto_payment_log()
     try:
       auto_payment()
     # 要素が見つからない場合

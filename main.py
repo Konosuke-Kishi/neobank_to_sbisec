@@ -4,6 +4,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 from config import CONFIG
 import chromedriver_binary_sync, time, datetime, logging, os
 # ======================================================
@@ -27,16 +28,8 @@ XPATH_CHK_TRAN = CONFIG['xpath_check_tran']
 XPATH_EXE_TRAN = CONFIG['xpath_execute_tran']
 XPATH_CMT_TRAN = CONFIG['xpath_commit_tran']
 # ======================================================
-# ログの設定
+# ログ削除メソッド
 # ======================================================
-logging.basicConfig(
-  # ログを保存するファイル名
-  filename='auto_payment.log',
-  # ログレベル（INFO以上を記録）
-  level=logging.INFO,
-  # ログ出力のフォーマット形式
-  format='%(asctime)s - %(levelname)s - %(message)s'
-)
 # 月初にログを削除する
 def delete_auto_payment_log():
   # 今日の日付を取得
@@ -65,6 +58,19 @@ options.add_argument('--disable-popup-blocking')
 def auto_payment():
 
   # ======================================================
+  # 0. ログの設定
+  # ======================================================
+  # ログ出力設定
+  logging.basicConfig(
+  # ログを保存するファイル名
+  filename='auto_payment.log',
+  # ログレベル（INFO以上を記録）
+  level=logging.INFO,
+  # ログ出力のフォーマット形式
+  format='%(asctime)s - %(levelname)s - %(message)s'
+  )
+
+  # ======================================================
   # 1. SBI証券ログイン処理
   # ======================================================
   # Chromeブラウザを開く
@@ -87,6 +93,13 @@ def auto_payment():
   driver.find_element(by=By.NAME, value="ACT_login").click()
   logging.info("SBI証券：ログイン成功")
   time.sleep(2)
+  # 未読の重要なメッセージが存在する場合、スキップ
+  try:
+    driver.find_element(by=By.NAME, value="ACT_skip").click()
+    logging.warning("SBI証券：未読メッセージあり、スキップ")
+  except NoSuchElementException:
+    logging.info("SBI証券：未読メッセージなし")
+    pass
 
   # ======================================================
   # 2. SBI証券振込指示処理

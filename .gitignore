@@ -208,6 +208,8 @@ __marimo__/
 
 # selenium
 chromedriver
+THIRD_PARTY_NOTICES.chromedriver
+LICENSE.chromedriver
 
 # custom
-config copy.py
+config_edit.py
