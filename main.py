@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from config import CONFIG
 import chromedriver_binary_sync, time, datetime, logging, os
+
 # ======================================================
 # 設定ファイル（config.py）の読み込み
 # ======================================================
@@ -27,8 +28,9 @@ XPATH_INPUT_TRANPW = CONFIG['xpath_input_tran_pw']
 XPATH_CHK_TRAN = CONFIG['xpath_check_tran']
 XPATH_EXE_TRAN = CONFIG['xpath_execute_tran']
 XPATH_CMT_TRAN = CONFIG['xpath_commit_tran']
+
 # ======================================================
-# ログ削除メソッド
+# ログ削除メソッド(cron.pyから呼び出される)
 # ======================================================
 # 月初にログを削除する
 def delete_auto_payment_log():
@@ -93,11 +95,12 @@ def auto_payment():
   driver.find_element(by=By.NAME, value="ACT_login").click()
   logging.info("SBI証券：ログイン成功")
   time.sleep(2)
-  # 未読の重要なメッセージが存在する場合、スキップ
   try:
+    # 未読の重要なメッセージが存在する場合
     driver.find_element(by=By.NAME, value="ACT_skip").click()
-    logging.warning("SBI証券：未読メッセージあり、スキップ")
+    logging.warning("SBI証券：未読メッセージあり")
   except NoSuchElementException:
+    # 未読メッセージが存在しない場合は何もしない
     logging.info("SBI証券：未読メッセージなし")
     pass
 

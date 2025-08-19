@@ -11,6 +11,7 @@ if __name__ == '__main__':
     # 月初ならログ削除
     delete_auto_payment_log()
     try:
+      # 定額自動入金のメイン処理を実行
       auto_payment()
     # 要素が見つからない場合
     except NoSuchElementException:
