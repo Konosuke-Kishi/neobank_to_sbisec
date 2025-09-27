@@ -95,14 +95,6 @@ def auto_payment():
   driver.find_element(by=By.NAME, value="ACT_login").click()
   logging.info("SBI証券：ログイン成功")
   time.sleep(2)
-  try:
-    # 未読の重要なメッセージが存在する場合
-    driver.find_element(by=By.NAME, value="ACT_skip").click()
-    logging.warning("SBI証券：未読メッセージあり")
-  except NoSuchElementException:
-    # 未読メッセージが存在しない場合は何もしない
-    logging.info("SBI証券：未読メッセージなし")
-    pass
 
   # ======================================================
   # 2. SBI証券振込指示処理
