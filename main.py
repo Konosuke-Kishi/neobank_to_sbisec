@@ -11,14 +11,14 @@ import chromedriver_binary_sync, time, datetime, logging, os
 # 設定ファイル（config.py）の読み込み
 # ======================================================
 # Chromeユーザプロファイルの格納先パス
-CHROME_USER_DATA_DIR = CONFIG['chromeUserDateDir']
+CHROME_USER_DATA_DIR = CONFIG['chromeUserDataDir']
 # SBI証券情報
-SBI_SEC_LOGIN_ID = CONFIG['sbisecUserId']
+SBI_SEC_USERNAME = CONFIG['sbisecUserName']
 SBI_SEC_PASSWORD = CONFIG['sbisecPassword']
 SBI_SEC_TRAN_PWD = CONFIG['sbisecTranPassword']
 SBI_SEC_MONEYAMT = CONFIG['sbisecAmountOfMoney']
 # NEOBANK情報
-NEOBANK_USERNAME = CONFIG['neobankUserId']
+NEOBANK_USERNAME = CONFIG['neobankUserName']
 NEOBANK_PASSWORD = CONFIG['neoBankPassword']
 NEOBANK_TRAN_PWD = CONFIG['neobankTranPassword']
 # XPATH一覧
@@ -78,20 +78,20 @@ def auto_payment():
   logging.info("==========処理開始==========")
   driver = webdriver.Chrome(options=options)
   logging.info("WebDriver：ブラウザ起動完了")
-  # SBI証券のトップページを開く
-  driver.get("https://site3.sbisec.co.jp/ETGate/")
+  # SBI証券のログインページを開く
+  driver.get("https://login.sbisec.co.jp/login/")
   logging.info("WebDriver：サイトアクセス成功")
   time.sleep(2)
   # SBI証券のユーザ名入力
-  userid = driver.find_element(by=By.NAME, value="user_id")
-  userid.send_keys(SBI_SEC_LOGIN_ID)
-  logging.info("SBI証券：ユーザネーム入力")
+  userid = driver.find_element(by=By.NAME, value="username")
+  userid.send_keys(SBI_SEC_USERNAME)
+  logging.info("SBI証券：ユーザ名入力")
   # SBI証券のログインパスワード入力
-  password = driver.find_element(by=By.NAME, value="user_password")
+  password = driver.find_element(by=By.NAME, value="password")
   password.send_keys(SBI_SEC_PASSWORD)
   logging.info("SBI証券：ログインパスワード入力")
   # SBI証券のログインボタン押下
-  driver.find_element(by=By.NAME, value="ACT_login").click()
+  driver.find_element(by=By.ID, value="pw-btn").click()
   logging.info("SBI証券：ログイン成功")
   time.sleep(2)
 
@@ -132,10 +132,10 @@ def auto_payment():
   driver.find_element(by=By.ID, value="tneobank-login").click()
   time.sleep(2)
   logging.info("NEOBANK：支店選択")
-  # 住信SBIネット銀行のユーザネームを入力
+  # 住信SBIネット銀行のユーザ名を入力
   username = driver.find_element(by=By.ID, value="userNameNewLogin")
   username.send_keys(NEOBANK_USERNAME)
-  logging.info("NEOBANK：ユーザネーム入力")
+  logging.info("NEOBANK：ユーザ名入力")
   # 住信SBIネット銀行のログインパスワード入力
   neopassword = driver.find_element(by=By.ID, value="loginPwdSet")
   neopassword.send_keys(NEOBANK_PASSWORD)

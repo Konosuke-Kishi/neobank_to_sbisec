@@ -3,14 +3,14 @@
 # ======================================================
 CONFIG = {
     # Chromeユーザプロファイルの格納先パス（必須）
-    'chromeUserDateDir': '/Users/<Macのユーザ名>/Library/Application Support/Google/Chrome/Selenium', #左記はMacの例
+    'chromeUserDataDir': '/Users/<Macのユーザ名>/Library/Application Support/Google/Chrome/Selenium', #左記はMacの例
     # SBI証券情報（必須）
-    'sbisecUserId': '<SBI証券のログインID>', #例：123-4567890(支店番号3桁＋口座番号7桁)
+    'sbisecUserName': '<SBI証券のユーザ名(ログインID)>', #例：123-4567890(支店番号3桁＋口座番号7桁)
     'sbisecPassword': '<SBI証券のログインパスワード>',
     'sbisecTranPassword': '<SBI証券の取引パスワード>',
     'sbisecAmountOfMoney': 10000, #入金金額
     # NEOBANK認証情報（必須）
-    'neobankUserId': '<NEOBANKのログインメールアドレス>',
+    'neobankUserName': '<NEOBANKのユーザ名(ログインメールアドレス)>',
     'neoBankPassword': '<NEOBANKのログインパスワード>',
     'neobankTranPassword': '<NEOBANKの取引パスワード>',
     # LINE Messaging API情報（任意）
