@@ -2,8 +2,12 @@
 # 設定ファイル
 # ======================================================
 CONFIG = {
+    # 使用するブラウザの種類
+    'useBrowser': 'Chrome',
     # Chromeユーザプロファイルの格納先パス（必須）
     'chromeUserDataDir': '/Users/<Macのユーザ名>/Library/Application Support/Google/Chrome/Selenium', #左記はMacの例
+    # Firefoxユーザプロファイルの格納先パス（必須）
+    'FirefoxUserDataDir': '/Users/<Macのユーザ名>/Library/Application Support/Firefox/Profiles/xxxxxxxx.selenium-client.profile', #左記はMacの例
     # SBI証券情報（必須）
     'sbisecUserName': '<SBI証券のユーザ名(ログインID)>', #例：123-4567890(支店番号3桁＋口座番号7桁)
     'sbisecPassword': '<SBI証券のログインパスワード>',

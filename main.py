@@ -5,13 +5,18 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from config import CONFIG
-import chromedriver_binary_sync, time, datetime, logging, os
+import time, datetime, logging, os
+import chromedriver_autoinstaller, geckodriver_autoinstaller
 
 # ======================================================
 # 設定ファイル（config.py）の読み込み
 # ======================================================
+# 使用するブラウザの種類
+USE_BROWSER = CONFIG['useBrowser']
 # Chromeユーザプロファイルの格納先パス
 CHROME_USER_DATA_DIR = CONFIG['chromeUserDataDir']
+# Firefoxユーザプロファイルの格納先パス
+FIREFOX_USER_DATA_DIR = CONFIG['FirefoxUserDataDir']
 # SBI証券情報
 SBI_SEC_USERNAME = CONFIG['sbisecUserName']
 SBI_SEC_PASSWORD = CONFIG['sbisecPassword']
@@ -42,16 +47,23 @@ def delete_auto_payment_log():
     os.remove('./auto_payment.log')
 
 # ======================================================
-# Chrome起動設定
+# ドライバの設定
 # ======================================================
-# 現在のChromeのバージョンと一致するdriverをダウンロード
-chromedriver_binary_sync.download()
-# オプションの設定
-options = webdriver.ChromeOptions()
-# Chromeプロファイルの指定
-options.add_argument("--user-data-dir=" + CHROME_USER_DATA_DIR)
-# ポップアップウィンドウの許可設定
-options.add_argument('--disable-popup-blocking')
+# 使用するブラウザのバージョンと一致するdriverをダウンロードし
+# ブラウザごとにオプション・プロファイルを設定する
+if(USE_BROWSER == "Firefox"):
+  executable_path = geckodriver_autoinstaller.install()
+  options = webdriver.FirefoxOptions()
+  options.add_argument('--disable-popup-blocking')
+  options.add_argument("-profile")
+  options.add_argument(FIREFOX_USER_DATA_DIR)
+  service = webdriver.firefox.service.Service(executable_path=executable_path)
+else:
+  executable_path = chromedriver_autoinstaller.install()
+  options = webdriver.ChromeOptions()
+  options.add_argument('--disable-popup-blocking')
+  options.add_argument("--user-data-dir=" + CHROME_USER_DATA_DIR)
+  service = webdriver.chrome.service.Service(executable_path=executable_path)
 
 # ======================================================
 # 定額自動入金のメイン処理
@@ -59,7 +71,7 @@ options.add_argument('--disable-popup-blocking')
 def auto_payment():
 
   # ======================================================
-  # 0. ログの設定
+  # 0. 起動設定
   # ======================================================
   # ログ出力設定
   logging.basicConfig(
@@ -70,14 +82,18 @@ def auto_payment():
   # ログ出力のフォーマット形式
   format='%(asctime)s - %(levelname)s - %(message)s'
   )
+  # ブラウザを開く
+  logging.info("==========処理開始==========")
+  # 使用するブラウザによって分岐
+  if(USE_BROWSER == "Firefox"):
+    driver = webdriver.Firefox(options=options, service=service)
+  else:
+    driver = webdriver.Chrome(options=options, service=service)
+  logging.info("WebDriver：ブラウザ起動完了")
 
   # ======================================================
   # 1. SBI証券ログイン処理
   # ======================================================
-  # Chromeブラウザを開く
-  logging.info("==========処理開始==========")
-  driver = webdriver.Chrome(options=options)
-  logging.info("WebDriver：ブラウザ起動完了")
   # SBI証券のログインページを開く
   driver.get("https://login.sbisec.co.jp/login/")
   logging.info("WebDriver：サイトアクセス成功")
