@@ -32,6 +32,8 @@ XPATH_INPUT_TRANPW = CONFIG['xpath_input_tran_pw']
 XPATH_CHK_TRAN = CONFIG['xpath_check_tran']
 XPATH_EXE_TRAN = CONFIG['xpath_execute_tran']
 XPATH_CMT_TRAN = CONFIG['xpath_commit_tran']
+XPATH_LOGIN_BUTTON = CONFIG['xpath_login_button']
+XPATH_AUTH_BUTTON = CONFIG['xpath_auth_button']
 
 # ======================================================
 # ログ削除メソッド(cron.pyから呼び出される)
@@ -145,32 +147,41 @@ def auto_payment():
   driver.switch_to.window(newhandles[1])
   logging.info("NEOBANK：ウィンドウ切替成功")
   # 支店選択
-  driver.find_element(by=By.ID, value="tneobank-login").click()
-  time.sleep(2)
+  driver.find_element(by=By.LINK_TEXT, value="Vポイント支店").click()
   logging.info("NEOBANK：支店選択")
+  time.sleep(2)
   # 住信SBIネット銀行のユーザ名を入力
-  username = driver.find_element(by=By.ID, value="userNameNewLogin")
+  username = driver.find_element(by=By.XPATH, value="//input[@id='username']")
   username.send_keys(NEOBANK_USERNAME)
   logging.info("NEOBANK：ユーザ名入力")
+  # ログインボタン押下
+  driver.find_element(by=By.XPATH, value=XPATH_LOGIN_BUTTON).click()
+  logging.info("NEOBANK：ログインボタン押下")
+  time.sleep(3)
   # 住信SBIネット銀行のログインパスワード入力
-  neopassword = driver.find_element(by=By.ID, value="loginPwdSet")
+  neopassword = driver.find_element(by=By.ID, value="loginPwd")
   neopassword.send_keys(NEOBANK_PASSWORD)
   logging.info("NEOBANK：ログインパスワード入力")
   # ログインボタン押下
-  driver.find_element(by=By.CLASS_NAME, value="m-btnEm-l").click()
+  driver.find_element(by=By.XPATH, value=XPATH_AUTH_BUTTON).click()
   logging.info("NEOBANK：ログイン成功")
-  time.sleep(2)
+  time.sleep(3)
 
   # ======================================================
   # 4. 住信SBIネット銀行入金確定処理
   # ======================================================
+  # 住信SBIネット銀行の入金確定ボタン押下
+  driver.find_element(by=By.CLASS_NAME, value="m-btnEm-l").click()
+  logging.info("NEOBANK：入金確定ボタン押下")
+  time.sleep(2)
   # 住信SBIネット銀行の取引パスワード入力
-  tra_passwd = driver.find_element(by=By.ID, value="toriPwd")
+  tra_passwd = driver.find_element(by=By.ID, value="transPW")
   tra_passwd.send_keys(NEOBANK_TRAN_PWD)
   logging.info("NEOBANK：取引パスワード入力")
-  # 住信SBIネット銀行の確定ボタン押下
-  driver.find_element(by=By.XPATH, value=XPATH_CMT_TRAN).click()
+  # 住信SBIネット銀行の認証ボタン押下
+  driver.find_element(by=By.XPATH, value=XPATH_AUTH_BUTTON).click()
   logging.info("NEOBANK：取引確定完了")
+  time.sleep(3)
   # 処理終了
   logging.info("WebDriver：ブラウザを閉じる")
   driver.quit()
