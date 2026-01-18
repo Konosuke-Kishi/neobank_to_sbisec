@@ -208,3 +208,6 @@ __marimo__/
 
 # custom
 config_edit.py
+copilot_test/
+tools/
+logs/
