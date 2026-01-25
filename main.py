@@ -27,6 +27,7 @@ NEOBANK_USERNAME = CONFIG['neobankUserName']
 NEOBANK_PASSWORD = CONFIG['neoBankPassword']
 NEOBANK_TRAN_PWD = CONFIG['neobankTranPassword']
 # XPATH一覧
+XPATH_PAGE_LINK = CONFIG['xpath_page_link']
 XPATH_INPUT_AMOUNT = CONFIG['xpath_input_amount']
 XPATH_INPUT_TRANPW = CONFIG['xpath_input_tran_pw']
 XPATH_CHK_TRAN = CONFIG['xpath_check_tran']
@@ -99,7 +100,7 @@ def auto_payment():
   # SBI証券のログインページを開く
   driver.get("https://login.sbisec.co.jp/login/")
   logging.info("WebDriver：サイトアクセス成功")
-  time.sleep(2)
+  time.sleep(3)
   # SBI証券のユーザ名入力
   userid = driver.find_element(by=By.NAME, value="username")
   userid.send_keys(SBI_SEC_USERNAME)
@@ -111,15 +112,15 @@ def auto_payment():
   # SBI証券のログインボタン押下
   driver.find_element(by=By.ID, value="pw-btn").click()
   logging.info("SBI証券：ログイン成功")
-  time.sleep(2)
+  time.sleep(3)
 
   # ======================================================
   # 2. SBI証券振込指示処理
   # ======================================================
   # SBI証券の入金ボタンを押下
-  driver.find_element(by=By.LINK_TEXT, value='入金').click()
+  driver.find_element(by=By.XPATH, value=XPATH_PAGE_LINK).click()
   logging.info("SBI証券：入金ページ遷移")
-  time.sleep(2)
+  time.sleep(3)
   # SBI証券の入金額を入力
   input_money = driver.find_element(by=By.XPATH, value=XPATH_INPUT_AMOUNT)
   input_money.send_keys(SBI_SEC_MONEYAMT)
@@ -132,28 +133,41 @@ def auto_payment():
   insert_money_check = driver.find_element(by=By.XPATH, value=XPATH_CHK_TRAN)
   insert_money_check.send_keys(Keys.SPACE)
   logging.info("SBI証券：入金指示確認ボタン押下")
-  time.sleep(2)
+  time.sleep(3)
   # SBI証券の入金指示ボタン押下
   insert_money_execute = driver.find_element(by=By.XPATH, value=XPATH_EXE_TRAN)
   insert_money_execute.send_keys(Keys.SPACE)
   logging.info("SBI証券：入金指示完了")
-  time.sleep(2)
+  time.sleep(3)
 
   # ======================================================
   # 3. 住信SBIネット銀行ログイン処理
   # ======================================================
   # ウインドウを切り替える
+  print(f"Window count before wait: {len(driver.window_handles)}")
+  # ポップアップウィンドウが開くまで待機（最大15秒）
+  for attempt in range(15):
+    if len(driver.window_handles) > 1:
+      break
+    time.sleep(1)
+
   newhandles = driver.window_handles
-  driver.switch_to.window(newhandles[1])
-  logging.info("NEOBANK：ウィンドウ切替成功")
+  logging.info(f"ウィンドウ数: {len(newhandles)}")
+
+  if len(newhandles) > 1:
+    driver.switch_to.window(newhandles[1])
+    logging.info("NEOBANK：ウィンドウ切替成功")
+  else:
+    logging.warning("NEOBANK：ウィンドウが開かれていません")
+    raise Exception("NEOBANK ウィンドウが開かれていません")
   # 支店選択
-  driver.find_element(by=By.LINK_TEXT, value="Vポイント支店").click()
+  driver.find_element(by=By.ID, value="CCC").click()
   logging.info("NEOBANK：支店選択")
-  time.sleep(2)
+  time.sleep(3)
   # 住信SBIネット銀行のユーザ名を入力
   username = driver.find_element(by=By.XPATH, value="//input[@id='username']")
   username.send_keys(NEOBANK_USERNAME)
-  logging.info("NEOBANK：ユーザ名入力")
+  logging.info("NEOBANK：ユーザ名入力") 
   # ログインボタン押下
   driver.find_element(by=By.XPATH, value=XPATH_LOGIN_BUTTON).click()
   logging.info("NEOBANK：ログインボタン押下")
@@ -170,10 +184,10 @@ def auto_payment():
   # ======================================================
   # 4. 住信SBIネット銀行入金確定処理
   # ======================================================
-  # 住信SBIネット銀行の入金確定ボタン押下
-  driver.find_element(by=By.CLASS_NAME, value="m-btnEm-l").click()
-  logging.info("NEOBANK：入金確定ボタン押下")
-  time.sleep(2)
+  # 住信SBIネット銀行の確定するボタン押下
+  driver.find_element(by=By.XPATH, value=XPATH_CMT_TRAN).click()
+  logging.info("NEOBANK：確定するボタン押下")
+  time.sleep(3)
   # 住信SBIネット銀行の取引パスワード入力
   tra_passwd = driver.find_element(by=By.ID, value="transPW")
   tra_passwd.send_keys(NEOBANK_TRAN_PWD)

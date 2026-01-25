@@ -30,23 +30,23 @@ if __name__ == '__main__':
       # 定額自動入金のメイン処理を実行
       auto_payment()
     # 要素が見つからない場合
-    except NoSuchElementException:
-      line_notify("要素が見つかりませんでした")
+    except NoSuchElementException as e:
+      msg = "要素が見つかりませんでした"
       logger.exception(f"{msg}\n詳細: {e}")
       line_notify(msg)
     # 処理が遅く、タイムアウトしてしまった場合
-    except TimeoutException:
-      line_notify("操作がタイムアウトしました")
+    except TimeoutException as e:
+      msg = "操作がタイムアウトしました"
       logger.exception(f"{msg}\n詳細: {e}")
       line_notify(msg)
     # WebDriver関連のエラーの場合
-    except WebDriverException:
-      line_notify("WebDriverエラーが発生しました")
+    except WebDriverException as e:
+      msg = "WebDriverエラーが発生しました"
       logger.exception(f"{msg}\n詳細: {e}")
       line_notify(msg)
     # それ以外のエラーの場合
     except Exception as e:
-      line_notify(f"予期しないエラーが発生しました\n{e}")
+      msg = f"予期しないエラーが発生しました\n{e}"
       logger.exception(f"{msg}\n詳細: {e}")
       line_notify(msg)
     # 正常に処理が終了した場合

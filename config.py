@@ -21,6 +21,7 @@ CONFIG = {
     'lineUserId': '<LINE Messaging API設定で払い出したユーザID>',
     'lineChannelToken': '<LINE Messaging API設定で払い出したチャネルアクセストークン（長期）>',
     # XPATH一覧（変更しない）
+    'xpath_page_link': '//*[@id="mymenuSec"]/div/div[2]/div/div[2]/div[3]/a[1]',
     'xpath_input_amount': '/html/body/main/section/article/section/div/div[7]/div[1]/div/div/input',
     'xpath_input_tran_pw': '/html/body/main/section/article/section/div/div[9]/div/input',
     'xpath_check_tran': '/html/body/main/section/article/section/div/div[9]/button',
