@@ -112,7 +112,7 @@ def auto_payment():
   # SBI証券のログインボタン押下
   driver.find_element(by=By.ID, value="pw-btn").click()
   logging.info("SBI証券：ログイン成功")
-  time.sleep(3)
+  time.sleep(5)
 
   # ======================================================
   # 2. SBI証券振込指示処理
@@ -157,6 +157,7 @@ def auto_payment():
   if len(newhandles) > 1:
     driver.switch_to.window(newhandles[1])
     logging.info("NEOBANK：ウィンドウ切替成功")
+    time.sleep(3)
   else:
     logging.warning("NEOBANK：ウィンドウが開かれていません")
     raise Exception("NEOBANK ウィンドウが開かれていません")
