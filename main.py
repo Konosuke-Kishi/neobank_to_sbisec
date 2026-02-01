@@ -27,7 +27,6 @@ NEOBANK_USERNAME = CONFIG['neobankUserName']
 NEOBANK_PASSWORD = CONFIG['neoBankPassword']
 NEOBANK_TRAN_PWD = CONFIG['neobankTranPassword']
 # XPATH一覧
-XPATH_PAGE_LINK = CONFIG['xpath_page_link']
 XPATH_INPUT_AMOUNT = CONFIG['xpath_input_amount']
 XPATH_INPUT_TRANPW = CONFIG['xpath_input_tran_pw']
 XPATH_CHK_TRAN = CONFIG['xpath_check_tran']
@@ -112,13 +111,13 @@ def auto_payment():
   # SBI証券のログインボタン押下
   driver.find_element(by=By.ID, value="pw-btn").click()
   logging.info("SBI証券：ログイン成功")
-  time.sleep(5)
+  time.sleep(10)
 
   # ======================================================
   # 2. SBI証券振込指示処理
   # ======================================================
   # SBI証券の入金ボタンを押下
-  driver.find_element(by=By.XPATH, value=XPATH_PAGE_LINK).click()
+  driver.find_element(by=By.LINK_TEXT, value="入金").click()
   logging.info("SBI証券：入金ページ遷移")
   time.sleep(3)
   # SBI証券の入金額を入力
@@ -154,10 +153,18 @@ def auto_payment():
   newhandles = driver.window_handles
   logging.info(f"ウィンドウ数: {len(newhandles)}")
 
-  if len(newhandles) > 1:
+  if len(newhandles) > 2:
+    for newhandle in newhandles[:-2]:
+      driver.switch_to.window(newhandle)
+      logging.info("NEOBANK：不要ウィンドウ閉鎖")
+      driver.close()
+    driver.switch_to.window(newhandles[-1])
+    logging.info("NEOBANK：ウィンドウ切替成功")
+    time.sleep(10)
+  elif len(newhandles) > 1:
     driver.switch_to.window(newhandles[1])
     logging.info("NEOBANK：ウィンドウ切替成功")
-    time.sleep(3)
+    time.sleep(10)
   else:
     logging.warning("NEOBANK：ウィンドウが開かれていません")
     raise Exception("NEOBANK ウィンドウが開かれていません")
