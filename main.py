@@ -16,7 +16,7 @@ USE_BROWSER = CONFIG['useBrowser']
 # Chromeユーザプロファイルの格納先パス
 CHROME_USER_DATA_DIR = CONFIG['chromeUserDataDir']
 # Firefoxユーザプロファイルの格納先パス
-FIREFOX_USER_DATA_DIR = CONFIG['FirefoxUserDataDir']
+FIREFOX_USER_DATA_DIR = CONFIG['firefoxUserDataDir']
 # SBI証券情報
 SBI_SEC_USERNAME = CONFIG['sbisecUserName']
 SBI_SEC_PASSWORD = CONFIG['sbisecPassword']
@@ -88,9 +88,9 @@ def auto_payment():
   logging.info("==========処理開始==========")
   # 使用するブラウザによって分岐
   if(USE_BROWSER == "Firefox"):
-    driver = webdriver.Firefox(options=options, service=service)
+    driver = webdriver.Firefox(service=service, options=options)
   else:
-    driver = webdriver.Chrome(options=options, service=service)
+    driver = webdriver.Chrome(service=service, options=options)
   logging.info("WebDriver：ブラウザ起動完了")
 
   # ======================================================
