@@ -97,7 +97,7 @@ def auto_payment():
   # 1. SBI証券ログイン処理
   # ======================================================
   # SBI証券のログインページを開く
-  driver.get("https://login.sbisec.co.jp/login/")
+  driver.get("https://login.sbisec.co.jp/login/entry")
   logging.info("WebDriver：サイトアクセス成功")
   time.sleep(3)
   # SBI証券のユーザ名入力
