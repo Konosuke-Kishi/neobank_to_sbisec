@@ -4,8 +4,10 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from config import CONFIG
-import time, datetime, logging, os
+import datetime, logging, os
 import chromedriver_autoinstaller
 import geckodriver_autoinstaller
 
@@ -35,6 +37,9 @@ XPATH_EXE_TRAN = CONFIG['xpath_execute_tran']
 XPATH_CMT_TRAN = CONFIG['xpath_commit_tran']
 XPATH_LOGIN_BUTTON = CONFIG['xpath_login_button']
 XPATH_AUTH_BUTTON = CONFIG['xpath_auth_button']
+# 待機時間
+ELEMENT_WAIT_TIME = 30
+DEVICE_AUTH_WAIT_TIME = 120
 
 # ======================================================
 # ログ削除メソッド(cron.pyから呼び出される)
@@ -100,45 +105,48 @@ def auto_payment():
   # SBI証券のログインページを開く
   driver.get("https://login.sbisec.co.jp/login/entry")
   logging.info("WebDriver：サイトアクセス成功")
-  time.sleep(3)
   # SBI証券のユーザ名入力
-  userid = driver.find_element(by=By.NAME, value="username")
+  userid = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.NAME, "username")))
   userid.send_keys(SBI_SEC_USERNAME)
   logging.info("SBI証券：ユーザ名入力")
   # SBI証券のログインパスワード入力
-  password = driver.find_element(by=By.NAME, value="password")
+  password = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.NAME, "password")))
   password.send_keys(SBI_SEC_PASSWORD)
   logging.info("SBI証券：ログインパスワード入力")
   # SBI証券のログインボタン押下
-  driver.find_element(by=By.ID, value="pw-btn").click()
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.ID, "pw-btn"))).click()
   logging.info("SBI証券：ログイン成功")
-  time.sleep(10)
 
   # ======================================================
   # 2. SBI証券振込指示処理
   # ======================================================
-  # SBI証券の入金ボタンを押下
-  driver.find_element(by=By.LINK_TEXT, value="入金").click()
+  # デバイス認証のため、120秒待機してSBI証券の入金ボタンを押下
+  WebDriverWait(driver, DEVICE_AUTH_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.LINK_TEXT, "入金"))).click()
   logging.info("SBI証券：入金ページ遷移")
-  time.sleep(3)
   # SBI証券の入金額を入力
-  input_money = driver.find_element(by=By.XPATH, value=XPATH_INPUT_AMOUNT)
+  input_money = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_INPUT_AMOUNT)))
   input_money.send_keys(SBI_SEC_MONEYAMT)
   logging.info("SBI証券：金額入力")
   # SBI証券の取引パスワード入力
-  input_tran_passwd = driver.find_element(by=By.XPATH, value=XPATH_INPUT_TRANPW)
+  input_tran_passwd = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_INPUT_TRANPW)))
   input_tran_passwd.send_keys(SBI_SEC_TRAN_PWD)
   logging.info("SBI証券：取引パスワード入力")
   # SBI証券の入金指示確認ボタン押下
-  insert_money_check = driver.find_element(by=By.XPATH, value=XPATH_CHK_TRAN)
+  insert_money_check = WebDriverWait(driver,  ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_CHK_TRAN)))
   insert_money_check.send_keys(Keys.SPACE)
   logging.info("SBI証券：入金指示確認ボタン押下")
-  time.sleep(3)
   # SBI証券の入金指示ボタン押下
-  insert_money_execute = driver.find_element(by=By.XPATH, value=XPATH_EXE_TRAN)
+  insert_money_execute = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_EXE_TRAN)))
   insert_money_execute.send_keys(Keys.SPACE)
   logging.info("SBI証券：入金指示完了")
-  time.sleep(3)
 
   # ======================================================
   # 3. 住信SBIネット銀行ログイン処理
@@ -149,7 +157,6 @@ def auto_payment():
   for attempt in range(15):
     if len(driver.window_handles) > 1:
       break
-    time.sleep(1)
 
   newhandles = driver.window_handles
   logging.info(f"ウィンドウ数: {len(newhandles)}")
@@ -161,50 +168,51 @@ def auto_payment():
       driver.close()
     driver.switch_to.window(newhandles[-1])
     logging.info("NEOBANK：ウィンドウ切替成功")
-    time.sleep(10)
   elif len(newhandles) > 1:
     driver.switch_to.window(newhandles[1])
     logging.info("NEOBANK：ウィンドウ切替成功")
-    time.sleep(10)
   else:
     logging.warning("NEOBANK：ウィンドウが開かれていません")
     raise Exception("NEOBANK ウィンドウが開かれていません")
   # 支店選択
-  driver.find_element(by=By.ID, value="CCC").click()
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.ID, "CCC"))).click()
   logging.info("NEOBANK：支店選択")
-  time.sleep(3)
   # 住信SBIネット銀行のユーザ名を入力
-  username = driver.find_element(by=By.XPATH, value="//input[@id='username']")
+  username = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, "//input[@id='username']")))
   username.send_keys(NEOBANK_USERNAME)
   logging.info("NEOBANK：ユーザ名入力") 
   # ログインボタン押下
-  driver.find_element(by=By.XPATH, value=XPATH_LOGIN_BUTTON).click()
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_LOGIN_BUTTON))).click()
   logging.info("NEOBANK：ログインボタン押下")
-  time.sleep(3)
   # 住信SBIネット銀行のログインパスワード入力
-  neopassword = driver.find_element(by=By.ID, value="loginPwd")
+  neopassword = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.ID, "loginPwd")))
   neopassword.send_keys(NEOBANK_PASSWORD)
   logging.info("NEOBANK：ログインパスワード入力")
   # ログインボタン押下
-  driver.find_element(by=By.XPATH, value=XPATH_AUTH_BUTTON).click()
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_AUTH_BUTTON))).click()
   logging.info("NEOBANK：ログイン成功")
-  time.sleep(3)
 
   # ======================================================
   # 4. 住信SBIネット銀行入金確定処理
   # ======================================================
   # 住信SBIネット銀行の確定するボタン押下
-  driver.find_element(by=By.XPATH, value=XPATH_CMT_TRAN).click()
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_CMT_TRAN))).click()
   logging.info("NEOBANK：確定するボタン押下")
-  time.sleep(3)
   # 住信SBIネット銀行の取引パスワード入力
-  tra_passwd = driver.find_element(by=By.ID, value="transPW")
+  tra_passwd = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.ID, "transPW")))
   tra_passwd.send_keys(NEOBANK_TRAN_PWD)
   logging.info("NEOBANK：取引パスワード入力")
   # 住信SBIネット銀行の認証ボタン押下
-  driver.find_element(by=By.XPATH, value=XPATH_AUTH_BUTTON).click()
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_AUTH_BUTTON))).click()
   logging.info("NEOBANK：取引確定完了")
-  time.sleep(3)
   # 処理終了
   logging.info("WebDriver：ブラウザを閉じる")
   driver.quit()
