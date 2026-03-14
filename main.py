@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from config import CONFIG
 import time, datetime, logging, os
 import chromedriver_autoinstaller
+import geckodriver_autoinstaller
 
 # ======================================================
 # 設定ファイル（config.py）の読み込み
@@ -54,7 +55,7 @@ def delete_auto_payment_log():
 # 使用するブラウザのバージョンと一致するdriverをダウンロードし
 # ブラウザごとにオプション・プロファイルを設定する
 if(USE_BROWSER == "Firefox"):
-  executable_path = "/usr/local/bin/geckodriver"
+  executable_path = geckodriver_autoinstaller.install()
   options = webdriver.FirefoxOptions()
   options.add_argument('--disable-popup-blocking')
   options.add_argument("-profile")

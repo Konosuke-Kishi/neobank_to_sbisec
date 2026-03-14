@@ -26,6 +26,6 @@ CONFIG = {
     'xpath_check_tran': '/html/body/main/section/article/section/div/div[9]/button',
     'xpath_execute_tran': '/html/body/main/section/article/section/div/div[3]/div[2]/button[2]',
     'xpath_commit_tran': '/html/body/app/div/ng-component/div/main/ng-component/section[2]/div/ul/li/nb-button/a',
-    'xpath_login_button': '/html/body/app/div/ng-component/div/main/ng-component/form/div/section/ul/li[2]/a',
+    'xpath_login_button': '/html/body/app/div/ng-component/div/main/ng-component/form/div/section/ul/li[1]/a',
     'xpath_auth_button': '/html/body/div[2]/div[2]/div/mat-dialog-container/wplauthcommon/div/section/form/div/ul/li/button'
 }
