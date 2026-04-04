@@ -65,13 +65,13 @@ if(USE_BROWSER == "Firefox"):
   options.add_argument('--disable-popup-blocking')
   options.add_argument("-profile")
   options.add_argument(FIREFOX_USER_DATA_DIR)
-  service = webdriver.firefox.service.Service(executable_path=executable_path)
+  service = webdriver.firefox.service.Service(executable_path)
 else:
   executable_path = chromedriver_autoinstaller.install()
   options = webdriver.ChromeOptions()
   options.add_argument('--disable-popup-blocking')
   options.add_argument("--user-data-dir=" + CHROME_USER_DATA_DIR)
-  service = webdriver.chrome.service.Service(executable_path=executable_path)
+  service = webdriver.chrome.service.Service(executable_path)
 
 # ======================================================
 # 定額自動入金のメイン処理
