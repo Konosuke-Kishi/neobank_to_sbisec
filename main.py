@@ -6,16 +6,17 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from config import CONFIG
-import datetime, logging, os
-import chromedriver_autoinstaller
-import geckodriver_autoinstaller
+import time, chromedriver_autoinstaller, geckodriver_autoinstaller
+from notify import line_notify
+from config_edit import CONFIG
 
 # ======================================================
 # 設定ファイル（config.py）の読み込み
 # ======================================================
 # 使用するブラウザの種類
 USE_BROWSER = CONFIG['useBrowser']
+# ヘッドレスブラウザを使用するかどうか
+USE_HEADLESS_BROWSER = CONFIG['useHeadlessBrowser']
 # Chromeユーザプロファイルの格納先パス
 CHROME_USER_DATA_DIR = CONFIG['chromeUserDataDir']
 # Firefoxユーザプロファイルの格納先パス
@@ -37,165 +38,142 @@ XPATH_EXE_TRAN = CONFIG['xpath_execute_tran']
 XPATH_CMT_TRAN = CONFIG['xpath_commit_tran']
 XPATH_LOGIN_BUTTON = CONFIG['xpath_login_button']
 XPATH_AUTH_BUTTON = CONFIG['xpath_auth_button']
+XPATH_CLOSE_BUTTON = CONFIG['xpath_close_button']
 # 待機時間
-ELEMENT_WAIT_TIME = 30
-DEVICE_AUTH_WAIT_TIME = 120
+ELEMENT_WAIT_TIME = 20
+DEVICE_AUTH_WAIT_TIME = 60
 
-# ======================================================
-# ログ削除メソッド(cron.pyから呼び出される)
-# ======================================================
-# 月初にログを削除する
-def delete_auto_payment_log():
-  # 今日の日付を取得
-  today = datetime.date.today()
-  # 今月の初日を取得
-  first_date_month = today.replace(day=1)
-  # 月初ならログファイル削除
-  if(today == first_date_month):
-    os.remove('./auto_payment.log')
+# ==============================================================
+# TODO: TimedRotatingFileHandlerを使用してログローテーションを実装する
+# ==============================================================
 
 # ======================================================
 # ドライバの設定
 # ======================================================
-# 使用するブラウザのバージョンと一致するdriverをダウンロードし
-# ブラウザごとにオプション・プロファイルを設定する
-if(USE_BROWSER == "Firefox"):
-  executable_path = geckodriver_autoinstaller.install()
-  options = webdriver.FirefoxOptions()
-  options.add_argument('--disable-popup-blocking')
-  options.add_argument("-profile")
-  options.add_argument(FIREFOX_USER_DATA_DIR)
-  service = webdriver.firefox.service.Service(executable_path)
-else:
-  executable_path = chromedriver_autoinstaller.install()
-  options = webdriver.ChromeOptions()
-  options.add_argument('--disable-popup-blocking')
-  options.add_argument("--user-data-dir=" + CHROME_USER_DATA_DIR)
-  service = webdriver.chrome.service.Service(executable_path)
+def create_driver():
+  if(USE_BROWSER == "Firefox"):
+    executable_path = geckodriver_autoinstaller.install()
+    options = webdriver.FirefoxOptions()
+    options.add_argument('--disable-popup-blocking')
+    options.add_argument("-profile")
+    options.add_argument(FIREFOX_USER_DATA_DIR)
+    options.headless = USE_HEADLESS_BROWSER
+    service = webdriver.firefox.service.Service(executable_path)
+    return webdriver.Firefox(service=service, options=options)
+  if(USE_BROWSER == "Chrome"):
+    executable_path = chromedriver_autoinstaller.install()
+    options = webdriver.ChromeOptions()
+    options.add_argument('--disable-popup-blocking')
+    options.add_argument(f"--user-data-dir={CHROME_USER_DATA_DIR}")
+    options.headless = USE_HEADLESS_BROWSER
+    service = webdriver.chrome.service.Service(executable_path)
+    return webdriver.Chrome(service=service, options=options)
 
 # ======================================================
 # 定額自動入金のメイン処理
 # ======================================================
 def auto_payment():
-
-  # ======================================================
-  # 0. 起動設定
-  # ======================================================
-  # ログ出力設定
-  logging.basicConfig(
-  # ログを保存するファイル名
-  filename='auto_payment.log',
-  # ログレベル（INFO以上を記録）
-  level=logging.INFO,
-  # ログ出力のフォーマット形式
-  format='%(asctime)s - %(levelname)s - %(message)s'
-  )
-  # ブラウザを開く
-  logging.info("==========処理開始==========")
-  # 使用するブラウザによって分岐
-  if(USE_BROWSER == "Firefox"):
-    driver = webdriver.Firefox(service=service, options=options)
-  else:
-    driver = webdriver.Chrome(service=service, options=options)
-  logging.info("WebDriver：ブラウザ起動完了")
-
+  # driverの設定
+  driver = create_driver()
   # ======================================================
   # 1. SBI証券ログイン処理
   # ======================================================
   # SBI証券のログインページを開く
   driver.get("https://login.sbisec.co.jp/login/entry")
-  logging.info("WebDriver：サイトアクセス成功")
   # SBI証券のユーザ名入力
   userid = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.NAME, "username")))
   userid.send_keys(SBI_SEC_USERNAME)
-  logging.info("SBI証券：ユーザ名入力")
   # SBI証券のログインパスワード入力
   password = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.NAME, "password")))
   password.send_keys(SBI_SEC_PASSWORD)
-  logging.info("SBI証券：ログインパスワード入力")
   # SBI証券のログインボタン押下
   WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.ID, "pw-btn"))).click()
-  logging.info("SBI証券：ログイン成功")
+
+  # ==============================================
+  # TODO: 初回のみここでデバイス認証が必要になる
+  # ==============================================
+  # メール認証未済であれば送信ボタン押下
+  time.sleep(ELEMENT_WAIT_TIME)
+  send_email_buttons = driver.find_elements(By.ID, "sendEmailButton")
+  if send_email_buttons:
+    send_email_buttons[0].click()
+  else: pass
+  # チェックボックス押下
+  time.sleep(ELEMENT_WAIT_TIME)
+  auth_check = driver.find_elements(By.ID, "authCheck")
+  if auth_check:
+    auth_check[0].click()
+  else: pass
+  # 認証番号をLINEでスマホに通知
+  auth_number = driver.find_elements(By.ID, "authCode")
+  if auth_number:
+    auth_number_text = auth_number[0].text.strip() or False
+    msg = f"デバイス認証コードは\n{auth_number_text}"
+    line_notify(msg)
+  else: pass
+  # デバイス認証完了後、登録ボタン押下
+  time.sleep(DEVICE_AUTH_WAIT_TIME)
+  otp_register_button = driver.find_elements(By.ID, "otpRegisterButton")
+  if otp_register_button:
+    otp_register_button[0].click()
+  else: pass
+
 
   # ======================================================
   # 2. SBI証券振込指示処理
   # ======================================================
-  # デバイス認証のため、120秒待機してSBI証券の入金ボタンを押下
-  WebDriverWait(driver, DEVICE_AUTH_WAIT_TIME).until(
+  # SBI証券の入金ボタンを押下
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.LINK_TEXT, "入金"))).click()
-  logging.info("SBI証券：入金ページ遷移")
   # SBI証券の入金額を入力
   input_money = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_INPUT_AMOUNT)))
   input_money.send_keys(SBI_SEC_MONEYAMT)
-  logging.info("SBI証券：金額入力")
   # SBI証券の取引パスワード入力
   input_tran_passwd = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_INPUT_TRANPW)))
   input_tran_passwd.send_keys(SBI_SEC_TRAN_PWD)
-  logging.info("SBI証券：取引パスワード入力")
   # SBI証券の入金指示確認ボタン押下
   insert_money_check = WebDriverWait(driver,  ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_CHK_TRAN)))
   insert_money_check.send_keys(Keys.SPACE)
-  logging.info("SBI証券：入金指示確認ボタン押下")
   # SBI証券の入金指示ボタン押下
   insert_money_execute = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_EXE_TRAN)))
   insert_money_execute.send_keys(Keys.SPACE)
-  logging.info("SBI証券：入金指示完了")
 
   # ======================================================
   # 3. 住信SBIネット銀行ログイン処理
   # ======================================================
-  # ウインドウを切り替える
-  print(f"Window count before wait: {len(driver.window_handles)}")
-  # ポップアップウィンドウが開くまで待機（最大15秒）
-  for attempt in range(15):
-    if len(driver.window_handles) > 1:
-      break
-
-  newhandles = driver.window_handles
-  logging.info(f"ウィンドウ数: {len(newhandles)}")
-
-  if len(newhandles) > 2:
-    for newhandle in newhandles[:-2]:
-      driver.switch_to.window(newhandle)
-      logging.info("NEOBANK：不要ウィンドウ閉鎖")
-      driver.close()
-    driver.switch_to.window(newhandles[-1])
-    logging.info("NEOBANK：ウィンドウ切替成功")
-  elif len(newhandles) > 1:
-    driver.switch_to.window(newhandles[1])
-    logging.info("NEOBANK：ウィンドウ切替成功")
-  else:
-    logging.warning("NEOBANK：ウィンドウが開かれていません")
-    raise Exception("NEOBANK ウィンドウが開かれていません")
+  # 現在のウィンドウハンドルを保存
+  main_window_handle = driver.current_window_handle
+  # 新しいウィンドウが開くのを待つ
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(EC.number_of_windows_to_be(2))
+  # 新しいウィンドウへ切り替え
+  for handle in driver.window_handles:
+      if handle != main_window_handle:
+          driver.switch_to.window(handle)
+          break
   # 支店選択
   WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.ID, "CCC"))).click()
-  logging.info("NEOBANK：支店選択")
   # 住信SBIネット銀行のユーザ名を入力
   username = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, "//input[@id='username']")))
   username.send_keys(NEOBANK_USERNAME)
-  logging.info("NEOBANK：ユーザ名入力") 
   # ログインボタン押下
   WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_LOGIN_BUTTON))).click()
-  logging.info("NEOBANK：ログインボタン押下")
   # 住信SBIネット銀行のログインパスワード入力
   neopassword = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.ID, "loginPwd")))
   neopassword.send_keys(NEOBANK_PASSWORD)
-  logging.info("NEOBANK：ログインパスワード入力")
   # ログインボタン押下
   WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_AUTH_BUTTON))).click()
-  logging.info("NEOBANK：ログイン成功")
 
   # ======================================================
   # 4. 住信SBIネット銀行入金確定処理
@@ -203,17 +181,15 @@ def auto_payment():
   # 住信SBIネット銀行の確定するボタン押下
   WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_CMT_TRAN))).click()
-  logging.info("NEOBANK：確定するボタン押下")
-  # 住信SBIネット銀行の取引パスワード入力
+  # 住信SBIネット銀行の取引パスワード入力 
   tra_passwd = WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.ID, "transPW")))
   tra_passwd.send_keys(NEOBANK_TRAN_PWD)
-  logging.info("NEOBANK：取引パスワード入力")
   # 住信SBIネット銀行の認証ボタン押下
   WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.XPATH, XPATH_AUTH_BUTTON))).click()
-  logging.info("NEOBANK：取引確定完了")
+  # 住信SBIネット銀行の閉じるボタン押下
+  WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
+    EC.element_to_be_clickable((By.XPATH, XPATH_CLOSE_BUTTON))).click()
   # 処理終了
-  logging.info("WebDriver：ブラウザを閉じる")
   driver.quit()
-  logging.info("==========処理終了==========")

@@ -3,11 +3,13 @@
 # ======================================================
 CONFIG = {
     # 使用するブラウザの種類
-    'useBrowser': 'Chrome',
+    'useBrowser': 'Chrome', # "Chrome" or "Firefox"
+    # ヘッドレスブラウザを使用するかどうか
+    'useHeadlessBrowser': False, #True or False
     # Chromeユーザプロファイルの格納先パス（必須）
     'chromeUserDataDir': '/Users/<Macのユーザ名>/Library/Application Support/Google/Chrome/Selenium', #左記はMacの例
     # Firefoxユーザプロファイルの格納先パス（必須）
-    'firefoxUserDataDir': '/Users/<Macのユーザ名>/Library/Application Support/Firefox/Profiles/xxxxxxxx.selenium-client.profile', #左記はMacの例
+    'firefoxUserDataDir': '/Users/<Macのユーザ名>/Library/Application Support/Firefox/Profiles/xxxxxxxx.プロファイル 1', #左記はMacの例
     # SBI証券情報（必須）
     'sbisecUserName': '<SBI証券のユーザ名(ログインID)>', #例：123-4567890(支店番号3桁＋口座番号7桁)
     'sbisecPassword': '<SBI証券のログインパスワード>',
@@ -27,5 +29,6 @@ CONFIG = {
     'xpath_execute_tran': '/html/body/main/section/article/section/div/div[3]/div[2]/button[2]',
     'xpath_commit_tran': '/html/body/app/div/ng-component/div/main/ng-component/section[2]/div/ul/li/nb-button/a',
     'xpath_login_button': '/html/body/app/div/ng-component/div/main/ng-component/form/div/section/ul/li[1]/a',
-    'xpath_auth_button': '/html/body/div[2]/div[2]/div/mat-dialog-container/wplauthcommon/div/section/form/div/ul/li/button'
+    'xpath_auth_button': '/html/body/div[2]/div[2]/div/mat-dialog-container/wplauthcommon/div/section/form/div/ul/li/button',
+    'xpath_close_button': '/html/body/table/tbody/tr[2]/td/div/form/input'
 }
