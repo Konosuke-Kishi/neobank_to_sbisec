@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time, chromedriver_autoinstaller, geckodriver_autoinstaller
 from notify import line_notify
-from config_edit import CONFIG
+from config import CONFIG
 
 # ======================================================
 # 設定ファイル（config.py）の読み込み
