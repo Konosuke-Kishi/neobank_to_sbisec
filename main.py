@@ -28,7 +28,7 @@ SBI_SEC_TRAN_PWD = CONFIG['sbisecTranPassword']
 SBI_SEC_MONEYAMT = CONFIG['sbisecAmountOfMoney']
 # NEOBANK情報
 NEOBANK_USERNAME = CONFIG['neobankUserName']
-NEOBANK_PASSWORD = CONFIG['neoBankPassword']
+NEOBANK_PASSWORD = CONFIG['neobankPassword']
 NEOBANK_TRAN_PWD = CONFIG['neobankTranPassword']
 # XPATH一覧
 XPATH_INPUT_AMOUNT = CONFIG['xpath_input_amount']

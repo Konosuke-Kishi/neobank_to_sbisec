@@ -21,7 +21,7 @@ CONFIG = {
     'sbisecAmountOfMoney': 10000, #入金金額
     # NEOBANK認証情報（必須）
     'neobankUserName': '<NEOBANKのユーザ名(ログインメールアドレス)>',
-    'neoBankPassword': '<NEOBANKのログインパスワード>',
+    'neobankPassword': '<NEOBANKのログインパスワード>',
     'neobankTranPassword': '<NEOBANKの取引パスワード>',
     # LINE Messaging API情報（任意）
     'lineUserId': '<LINE Messaging API設定で払い出したユーザID>',
