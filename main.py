@@ -40,8 +40,8 @@ XPATH_LOGIN_BUTTON = CONFIG['xpath_login_button']
 XPATH_AUTH_BUTTON = CONFIG['xpath_auth_button']
 XPATH_CLOSE_BUTTON = CONFIG['xpath_close_button']
 # 待機時間
-ELEMENT_WAIT_TIME = 20
-DEVICE_AUTH_WAIT_TIME = 60
+ELEMENT_WAIT_TIME = CONFIG['elementWaitTime']
+DEVICE_AUTH_WAIT_TIME = CONFIG['deviceAuthWaitTime']
 
 # ==============================================================
 # TODO: TimedRotatingFileHandlerを使用してログローテーションを実装する
@@ -193,3 +193,6 @@ def auto_payment():
     EC.element_to_be_clickable((By.XPATH, XPATH_CLOSE_BUTTON))).click()
   # 処理終了
   driver.quit()
+
+if __name__ == "__main__":
+    auto_payment()
