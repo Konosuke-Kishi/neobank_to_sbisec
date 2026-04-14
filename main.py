@@ -43,10 +43,6 @@ XPATH_CLOSE_BUTTON = CONFIG['xpath_close_button']
 ELEMENT_WAIT_TIME = CONFIG['elementWaitTime']
 DEVICE_AUTH_WAIT_TIME = CONFIG['deviceAuthWaitTime']
 
-# ==============================================================
-# TODO: TimedRotatingFileHandlerを使用してログローテーションを実装する
-# ==============================================================
-
 # ======================================================
 # ドライバの設定
 # ======================================================
@@ -75,6 +71,7 @@ def create_driver():
 def auto_payment():
   # driverの設定
   driver = create_driver()
+
   # ======================================================
   # 1. SBI証券ログイン処理
   # ======================================================
@@ -91,10 +88,10 @@ def auto_payment():
   # SBI証券のログインボタン押下
   WebDriverWait(driver, ELEMENT_WAIT_TIME).until(
     EC.element_to_be_clickable((By.ID, "pw-btn"))).click()
-
-  # ==============================================
-  # TODO: 初回のみここでデバイス認証が必要になる
-  # ==============================================
+  
+  # ======================================================
+  # 1'. デバイス認証処理（初回のみ）
+  # ======================================================
   # メール認証未済であれば送信ボタン押下
   time.sleep(ELEMENT_WAIT_TIME)
   send_email_buttons = driver.find_elements(By.ID, "sendEmailButton")
@@ -120,7 +117,6 @@ def auto_payment():
   if otp_register_button:
     otp_register_button[0].click()
   else: pass
-
 
   # ======================================================
   # 2. SBI証券振込指示処理
