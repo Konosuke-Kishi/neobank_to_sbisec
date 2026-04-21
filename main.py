@@ -50,7 +50,7 @@ def create_driver():
   if(USE_BROWSER == "Firefox"):
     executable_path = geckodriver_autoinstaller.install()
     options = webdriver.FirefoxOptions()
-    options.add_argument('--disable-popup-blocking')
+    options.add_argument("--disable-popup-blocking")
     options.add_argument("-profile")
     options.add_argument(FIREFOX_USER_DATA_DIR)
     options.headless = USE_HEADLESS_BROWSER
@@ -59,7 +59,7 @@ def create_driver():
   if(USE_BROWSER == "Chrome"):
     executable_path = chromedriver_autoinstaller.install()
     options = webdriver.ChromeOptions()
-    options.add_argument('--disable-popup-blocking')
+    options.add_argument("--disable-popup-blocking")
     options.add_argument(f"--user-data-dir={CHROME_USER_DATA_DIR}")
     options.headless = USE_HEADLESS_BROWSER
     service = webdriver.chrome.service.Service(executable_path)
@@ -117,7 +117,13 @@ def auto_payment():
   if otp_register_button:
     otp_register_button[0].click()
   else: pass
-
+  # あとで確認する押下
+  time.sleep(ELEMENT_WAIT_TIME)
+  msg_skip_btn = driver.find_elements(By.NAME, "ACT_skipMsg")
+  if msg_skip_btn:
+    msg_skip_btn[0].click()
+  else: pass
+  
   # ======================================================
   # 2. SBI証券振込指示処理
   # ======================================================
