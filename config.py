@@ -28,8 +28,8 @@ CONFIG = {
     'lineChannelToken': '<LINE Messaging API設定で払い出したチャネルアクセストークン（長期）>',
     # XPATH一覧（変更しない）
     'xpath_input_amount': '/html/body/main/section/article/section/div/div[7]/div[1]/div/div/input',
-    'xpath_input_tran_pw': '/html/body/main/section/article/section/div/div[9]/div/input',
-    'xpath_check_tran': '/html/body/main/section/article/section/div/div[9]/button',
+    'xpath_input_tran_pw': '/html/body/main/section/article/section/div/div[11]/div/input',
+    'xpath_check_tran': '/html/body/main/section/article/section/div/div[11]/button',
     'xpath_execute_tran': '/html/body/main/section/article/section/div/div[3]/div[2]/button[2]',
     'xpath_commit_tran': '/html/body/app/div/ng-component/div/main/ng-component/section[2]/div/ul/li/nb-button/a',
     'xpath_login_button': '/html/body/app/div/ng-component/div/main/ng-component/form/div/section/ul/li[1]/a',
