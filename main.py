@@ -112,7 +112,7 @@ def auto_payment():
     line_notify(msg)
   else: pass
   # デバイス認証完了後、登録ボタン押下
-  time.sleep(DEVICE_AUTH_WAIT_TIME)
+  time.sleep(DEVICE_AUTH_WAIT_TIME - ELEMENT_WAIT_TIME)
   otp_register_button = driver.find_elements(By.ID, "otpRegisterButton")
   if otp_register_button:
     otp_register_button[0].click()

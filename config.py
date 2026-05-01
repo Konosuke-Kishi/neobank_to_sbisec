@@ -7,9 +7,9 @@ CONFIG = {
     # ヘッドレスブラウザを使用するかどうか
     'useHeadlessBrowser': False, # True or False
     # ページ要素が見つかるまでの待機時間（秒）
-    'elementWaitTime': 30,
+    'elementWaitTime': 20,
     # デバイス認証の完了を待機する時間（秒）
-    'deviceAuthWaitTime': 120,
+    'deviceAuthWaitTime': 60,
     # Chromeユーザプロファイルの格納先パス（必須）
     'chromeUserDataDir': '/Users/<Macのユーザ名>/Library/Application Support/Google/Chrome/Selenium', #左記はMacの例
     # Firefoxユーザプロファイルの格納先パス（必須）
