@@ -53,7 +53,8 @@ def create_driver():
     options.add_argument("--disable-popup-blocking")
     options.add_argument("-profile")
     options.add_argument(FIREFOX_USER_DATA_DIR)
-    options.headless = USE_HEADLESS_BROWSER
+    if (USE_HEADLESS_BROWSER):
+        options.add_argument("-headless")
     service = webdriver.firefox.service.Service(executable_path)
     return webdriver.Firefox(service=service, options=options)
   if(USE_BROWSER == "Chrome"):
@@ -61,7 +62,8 @@ def create_driver():
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-popup-blocking")
     options.add_argument(f"--user-data-dir={CHROME_USER_DATA_DIR}")
-    options.headless = USE_HEADLESS_BROWSER
+    if (USE_HEADLESS_BROWSER):
+        options.add_argument("--headless=new")
     service = webdriver.chrome.service.Service(executable_path)
     return webdriver.Chrome(service=service, options=options)
 
